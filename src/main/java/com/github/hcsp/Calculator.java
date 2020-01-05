@@ -33,77 +33,42 @@ public class Calculator {
 //        return cal(q);
 //    }
 
-    public static int evaluateExpr(Deque<Object> stack) {
-
-        int res = 0;
-
-        if (!stack.isEmpty()) {
-            res = (int) stack.pop();
-        }
-
-        // Evaluate the expression till we get corresponding ')'
-        while (!stack.isEmpty() && !((char) stack.peek() == ')')) {
-
-            char sign = (char) stack.pop();
-
-            if (sign == '+') {
-                res += (int) stack.pop();
-            } else {
-                res -= (int) stack.pop();
-            }
-        }
-        return res;
-    }
 
     public static int calculate(String s) {
+        Deque<Integer> stack = new ArrayDeque<>();
+        int result = 0;
+        int number = 0;
+        int sign = 1;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c)) {
+                number = 10 * number + (int) (c - '0');
+            } else if (c == '+') {
+                result += sign * number;
+                number = 0;
+                sign = 1;
+            } else if (c == '-') {
+                result += sign * number;
+                number = 0;
+                sign = -1;
+            } else if (c == '(') {
+                //we push the result first, then sign;
+                stack.push(result);
+                stack.push(sign);
+                //reset the sign and result for the value in the parenthesis
+                sign = 1;
+                result = 0;
+            } else if (c == ')') {
+                result += sign * number;
+                number = 0;
+                result *= stack.pop();    //stack.pop() is the sign before the parenthesis
+                result += stack.pop();   //stack.pop() now is the result calculated before the parenthesis
 
-        int operand = 0;
-        int n = 0;
-        Deque<Object> stack = new ArrayDeque<>();
-
-        for (int i = s.length() - 1; i >= 0; i--) {
-
-            char ch = s.charAt(i);
-
-            if (Character.isDigit(ch)) {
-
-                // Forming the operand - in reverse order.
-                operand = (int) Math.pow(10, n) * (int) (ch - '0') + operand;
-                n += 1;
-
-            } else if (ch != ' ') {
-                if (n != 0) {
-
-                    // Save the operand on the stack
-                    // As we encounter some non-digit.
-                    stack.push(operand);
-                    n = 0;
-                    operand = 0;
-
-                }
-                if (ch == '(') {
-
-                    int res = evaluateExpr(stack);
-                    stack.pop();
-
-                    // Append the evaluated result to the stack.
-                    // This result could be of a sub-expression within the parenthesis.
-                    stack.push(res);
-
-                } else {
-                    // For other non-digits just push onto the stack.
-                    stack.push(ch);
-                }
             }
         }
+        if (number != 0) result += sign * number;
+        return result;
 
-        //Push the last operand to stack, if any.
-        if (n != 0) {
-            stack.push(operand);
-        }
-
-        // Evaluate any left overs in the stack.
-        return evaluateExpr(stack);
     }
 
 //    private static int cal(Queue<Character> q) {
