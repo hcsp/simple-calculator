@@ -29,7 +29,7 @@ public class ThreeSum15 {
      *
      * A solution set is:
      * [
-     *   [-1, -1, 2],
+     *   [-1, 0, -1],
      *   [-1, -1, 2]
      * ]
      *
